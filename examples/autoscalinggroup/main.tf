@@ -23,10 +23,20 @@ resource "aws_launch_template" "default" {
     enabled = false
   }
 
-  # terraform-null-label example used here: Set tags on volumes
+  # terraform-null-label example used here: Set tags on everything that can be tagged
   tag_specifications {
-    resource_type = "volume"
+    for_each = ["instance", "volume", "elastic-gpu", "spot-instance-request"]
+
+    resource_type = each.value
     tags          = module.label.tags
+  }
+
+  # Bridgecrew BC_AWS_GENERAL_26
+  tags = module.label.tags
+
+  # Bridgecrew compliance: Ensure Instance Metadata Service Version 1 is not enabled (BC_AWS_GENERAL_31)
+  metadata_options {
+    http_tokens = "required"
   }
 }
 
@@ -36,7 +46,7 @@ resource "aws_launch_template" "default" {
 resource "aws_autoscaling_group" "default" {
   # terraform-null-label example used here: Set ASG name prefix
   name_prefix         = "${module.label.id}-"
-  vpc_zone_identifier = data.aws_subnet_ids.all.ids
+  vpc_zone_identifier = data.aws_subnets.all.ids
   max_size            = "1"
   min_size            = "1"
   desired_capacity    = "1"
@@ -71,8 +81,11 @@ data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = data.aws_vpc.default.id
+data "aws_subnets" "all" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
 }
 
 data "aws_security_group" "default" {
