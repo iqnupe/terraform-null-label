@@ -27,7 +27,7 @@ always exported, and regardless of settings, empty labels are never exported as 
 You can control the case of the tag names (keys) for the labels using `var.label_key_case`.
 Unlike the tags generated from the label inputs, tags passed in via the `tags` input are not modified.
 
-There is an unfortunate collision over the use of the key `name`. Cloud Posse uses `name` in this module
+There is an unfortunate collision over the use of the key `name`. The module uses `name` in this module
 to represent the component, such as `eks` or `rds`. AWS uses a tag with the key `Name` to store the full human-friendly
 identifier of the thing tagged, which this module outputs as `id`, not `name`. So when converting input labels
 to tags, the value of the `Name` key is set to the module `id` output, and there is no tag corresponding to the
@@ -41,7 +41,7 @@ However, if you have multiple different kinds of resources (e.g. instances, secu
 
 ### Defaults
 
-Cloud Posse Terraform modules share a common `context` object that is meant to be passed from module to module.
+All these custom Terraform modules share a common `context` object that is meant to be passed from module to module.
 The context object is a single object that contains all the input values for `terraform-null-label`.
 However, each input value can also be specified individually by name as a standard Terraform variable,
 and the value of those variables, when set to something other than `null`, will override the value
@@ -68,9 +68,7 @@ object cannot be changed, so that later modules cannot re-enable a problematic t
 ```hcl
 module "eg_prod_bastion_label" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version = "x.x.x"
-
+ 
   namespace  = "eg"
   stage      = "prod"
   name       = "bastion"
@@ -122,8 +120,6 @@ Here is a more complex example with two instances using two different labels. No
 ```hcl
 module "eg_prod_bastion_label" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version = "x.x.x"
 
   namespace  = "eg"
   stage      = "prod"
@@ -138,8 +134,6 @@ module "eg_prod_bastion_label" {
 
 module "eg_prod_bastion_abc_label" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version = "x.x.x"
 
   attributes = ["abc"]
 
@@ -170,8 +164,7 @@ resource "aws_instance" "eg_prod_bastion_abc" {
 
 module "eg_prod_bastion_xyz_label" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version = "x.x.x"
+
 
   attributes = ["xyz"]
 
@@ -305,8 +298,6 @@ as a derivative of that.
 ```hcl
 module "label1" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version     = "x.x.x"
 
   namespace   = "iqnupe"
   tenant      = "H.R.H"
@@ -325,8 +316,6 @@ module "label1" {
 
 module "label2" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version     = "x.x.x"
 
   name      = "Charlie"
   tenant    = "" # setting to `null` would have no effect
@@ -349,8 +338,6 @@ module "label2" {
 
 module "label3" {
   source   = "iqnupe/label/null"
-  # Cloud Posse recommends pinning every module to a specific version
-  # version     = "x.x.x"
 
   name      = "Starfish"
   stage     = "release"
